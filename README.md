@@ -1,377 +1,371 @@
-# 💰 Walletfy 2.5 - Gestión Personal de Finanzas
+# 💰 Walletfy - Gestión Personal de Finanzas
 
-<div align="center">
+> **Una aplicación sencilla para controlar tus ingresos y gastos**
 
-![Walletfy Logo](https://img.shields.io/badge/💰-Walletfy-purple?style=for-the-badge)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-✓-blue)](https://www.typescriptlang.org/)
+[![Redux](https://img.shields.io/badge/Redux-✓-purple)](https://redux-toolkit.js.org/)
 
-**Una aplicación moderna para el control y seguimiento de ingresos y egresos personales**
+**🚀 [Ver Demo](https://walletfy.cardor.dev)**
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Redux](https://img.shields.io/badge/Redux-Toolkit-764ABC?style=flat-square&logo=redux)](https://redux-toolkit.js.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+---
 
-[Demo en Vivo](https://walletfy.cardor.dev) • [Documentación](#documentación) • [Instalación](#instalación)
+## � ¿Qué es Walletfy?
 
-</div>
+Walletfy es una aplicación web que te ayuda a:
+- ✅ Llevar control de tu dinero
+- ✅ Registrar ingresos y gastos
+- ✅ Ver tu balance por meses
+- ✅ Buscar transacciones específicas
 
-## 📋 Descripción del Proyecto
+**¡Todo se guarda automáticamente en tu navegador!**
 
-Walletfy 2.5 es una aplicación web completa para la **gestión de balance personal** que permite a los usuarios llevar un control detallado de sus finanzas mediante el registro de ingresos y egresos. La aplicación organiza automáticamente los eventos financieros por meses y calcula balances globales en tiempo real.
+---
 
-### 🎯 Características Principales
+## 🎯 Funcionalidades Principales
 
-- **🏦 Gestión de Balance Inicial**: Establece un monto base para todos los cálculos financieros
-- **➕ Creación de Eventos**: Registra ingresos y egresos con información completa (nombre, descripción, monto, fecha, adjuntos)
-- **📅 Organización Mensual**: Visualización automática de eventos agrupados por mes y año
-- **📊 Cálculos en Tiempo Real**: Balance mensual y global calculado automáticamente
-- **🔍 Búsqueda Inteligente**: Encuentra meses específicos con debouncing para mejor performance
-- **🌙 Tema Claro/Oscuro**: Alternancia entre temas con persistencia local
-- **📎 Adjuntos de Imagen**: Soporte para cargar y visualizar imágenes en eventos
-- **📱 Diseño Responsivo**: Experiencia optimizada para móviles, tablets y desktop
-- **💾 Persistencia Local**: Datos guardados automáticamente en el navegador
+### 💵 Balance Inicial
+- Define cuánto dinero tienes al empezar
+- Agrega dinero extra cuando necesites
 
-### 🚀 Demo
+### 📝 Crear Eventos
+- **Ingresos**: Cuando recibes dinero (salario, ventas, etc.)
+- **Gastos**: Cuando gastas dinero (comida, transporte, etc.)
+- Puedes agregar:
+  - Nombre del evento (máximo 20 caracteres)
+  - Descripción opcional
+  - Monto
+  - Fecha y hora
+  - Foto como comprobante
 
-Puedes ver la aplicación funcionando en: **[https://walletfy.cardor.dev](https://walletfy.cardor.dev)**
+### � Visualización
+- Tus eventos se organizan automáticamente por mes
+- Cada mes muestra:
+  - Total de ingresos (verde)
+  - Total de gastos (rojo)
+  - Balance final del mes
+  - Lista de todos los eventos
 
-## 🛠️ Tecnologías Utilizadas
+### 🔍 Búsqueda
+- Busca meses específicos escribiendo el nombre
+- Ejemplo: "Enero", "Diciembre 2024", etc.
 
-### Frontend Core
-- **React 19** - Framework de interfaz de usuario con las últimas características
-- **TypeScript** - Tipado estático para mayor robustez del código
-- **Vite** - Build tool moderno y rápido servidor de desarrollo
+### 🌙 Tema Oscuro/Claro
+- Cambia entre tema claro y oscuro
+- Se recuerda tu preferencia
 
-### Estilos y UI
-- **TailwindCSS** - Framework CSS utilitario para diseño responsivo
-- **Lucide React** - Librería de iconos moderna y consistente
+---
 
-### Gestión de Estado
-- **Redux Toolkit** - Manejo del estado global simplificado
-- **React Redux** - Integración oficial de Redux con React
-- **Redux Persist** - Persistencia automática del estado
+## 🛠️ Tecnologías Usadas
 
-### Enrutamiento y Navegación
-- **TanStack Router** - Enrutador moderno con tipado completo
-- **File-based Routing** - Rutas organizadas por estructura de archivos
+**Frontend:**
+- React 19 (interfaz de usuario)
+- TypeScript (código más seguro)
+- TailwindCSS (estilos bonitos)
 
-### Validación y Formularios
-- **Zod** - Validación de esquemas con tipado automático
-- **React Hook Form** - Manejo eficiente de formularios
+**Estado:**
+- Redux Toolkit (manejo de datos)
+- LocalStorage (guardar información)
 
-### Utilidades
-- **Moment.js** - Manipulación y formateo de fechas
-- **UUID** - Generación de identificadores únicos
-- **LocalStorage API** - Persistencia de datos en el navegador
+**Otros:**
+- Vite (herramientas de desarrollo)
+- TanStack Router (navegación entre páginas)
 
-## 🏗️ Arquitectura del Proyecto
+## 🚀 Cómo Usar la Aplicación
 
-```
-src/
-├── components/              # Componentes reutilizables
-│   ├── BalanceFlow.tsx     # Componente principal del dashboard
-│   ├── EventForm.tsx       # Formulario de eventos (crear/editar)
-│   ├── EventModal.tsx      # Modal para detalles de eventos
-│   ├── Header.tsx          # Barra de navegación
-│   └── ui/                 # Componentes de interfaz base
-├── store/                  # Estado global Redux
-│   ├── index.ts           # Configuración del store
-│   ├── appSlice.ts        # Estado de configuración global
-│   ├── eventsSlice.ts     # Estado de eventos financieros
-│   └── hooks.ts           # Hooks tipados para Redux
-├── types/                  # Definiciones TypeScript
-│   └── event.ts           # Esquemas Zod y tipos de eventos
-├── utils/                  # Funciones utilitarias
-│   └── balanceCalculations.ts # Lógica de cálculos financieros
-├── hooks/                  # Custom hooks
-│   └── simpleDebounce.ts  # Hook para optimización de búsquedas
-├── data/                   # Datos de ejemplo
-│   └── sampleEvents.ts    # Eventos predefinidos para demostración
-└── routes/                 # Definición de rutas
-    ├── __root.tsx         # Layout principal
-    ├── index.tsx          # Página de dashboard
-    └── form/
-        └── $id.tsx        # Formulario dinámico (nuevo/editar)
-```
+### Paso 1: Configurar tu balance inicial
+1. Abre la aplicación
+2. En la parte superior verás **"Balance Inicial Actual"**
+3. En **"Agregar dinero"** escribe cuánto dinero tienes
+4. Haz clic en **"Calcular"**
 
-## 📥 Instalación
+### Paso 2: Crear un evento (ingreso o gasto)
+1. Haz clic en **"Nuevo Evento"** en la barra superior
+2. Llena el formulario:
+   - **Nombre**: ¿Qué fue? (ej: "Compra supermercado")
+   - **Descripción**: Detalles opcionales
+   - **Cantidad**: ¿Cuánto dinero?
+   - **Fecha**: ¿Cuándo pasó?
+   - **Tipo**: ¿Ingreso o Egreso?
+   - **Foto**: Opcional (recibo, comprobante)
+3. Haz clic en **"Crear Evento"**
 
-### Prerrequisitos
+### Paso 3: Ver tus eventos
+- En la página principal verás tarjetas por cada mes
+- Cada tarjeta muestra:
+  - Ingresos totales del mes
+  - Gastos totales del mes
+  - Balance final acumulado
+  - Lista de todos los eventos
 
-- **Node.js** 18 o superior
-- **npm** 9 o superior
+### Paso 4: Editar o eliminar eventos
+- **Para ver detalles**: Haz clic en cualquier evento
+- **Para editar**: Haz clic en el ícono del lápiz (azul)
+- **Para eliminar**: Haz clic en el ícono de la basura (rojo)
 
-### Instalación Local
+### Paso 5: Buscar eventos
+- Usa la barra de búsqueda para encontrar meses específicos
+- Escribe: "Enero", "Diciembre 2024", etc.
 
-1. **Clona el repositorio**
+---
+
+## � Instalación para Desarrolladores
+
+### Requisitos
+- Node.js versión 18 o superior
+- npm (viene con Node.js)
+
+### Pasos de instalación
+
+1. **Descargar el proyecto**
    ```bash
-   git clone https://github.com/tu-usuario/walletfy-2.5.git
-   cd walletfy-2.5
+   git clone https://github.com/andatoba/ProyectReactWall.git
+   cd ProyectReactWall
    ```
 
-2. **Instala las dependencias**
+2. **Instalar dependencias**
    ```bash
    npm install
    ```
 
-3. **Inicia el servidor de desarrollo**
+3. **Ejecutar en modo desarrollo**
    ```bash
    npm run dev
    ```
 
-4. **Abre en tu navegador**
+4. **Abrir en tu navegador**
    ```
    http://localhost:3000
    ```
 
-### Scripts Disponibles
+### Comandos disponibles
 
 ```bash
-npm run dev        # Servidor de desarrollo
-npm run build      # Build para producción
-npm run preview    # Vista previa del build
-npm run lint       # Verificación de código con ESLint
-npm run format     # Formateo con Prettier
-npm run check      # Lint + Format automático
+npm run dev        # Iniciar servidor de desarrollo
+npm run build      # Crear versión para producción
+npm run preview    # Ver la versión de producción
 ```
 
-## 🎮 Uso de la Aplicación
+---
 
-### 1. Configuración Inicial
-- Define tu **balance inicial** en la sección superior
-- Usa el botón "Calcular" para agregar dinero adicional a tu balance
+## 📁 Estructura del Proyecto (Para Desarrolladores)
 
-### 2. Gestión de Eventos
-- **Crear nuevo evento**: Haz clic en "Nuevo Evento" en el header
-- **Editar evento**: Haz clic en cualquier evento existente
-- **Eliminar evento**: Usa el botón de eliminar en el modal de detalles
-
-### 3. Formulario de Eventos
-- **Nombre**: Máximo 20 caracteres (obligatorio)
-- **Descripción**: Máximo 100 caracteres (opcional)
-- **Monto**: Número positivo (obligatorio)
-- **Fecha**: Selector de fecha y hora
-- **Tipo**: Ingreso o Egreso
-- **Adjunto**: Imagen opcional (se convierte a base64)
-
-### 4. Visualización
-- **Dashboard principal**: Vista de balance por meses
-- **Búsqueda**: Encuentra meses específicos
-- **Detalles**: Cada mes muestra ingresos, egresos y balance global
-- **Lista de eventos**: Cada mes muestra todos sus eventos con nombres y montos
-
-### 5. Funcionalidades Adicionales
-- **Tema oscuro**: Toggle en el header
-- **Persistencia**: Todos los datos se guardan automáticamente
-- **Responsivo**: Funciona en cualquier dispositivo
-
-## 🏛️ Modelo de Datos
-
-### Entidad Evento
-
-```typescript
-interface Event {
-  id: string              // UUID único generado automáticamente
-  name: string           // Nombre del evento (máx. 20 caracteres)
-  description?: string   // Descripción opcional (máx. 100 caracteres)
-  amount: number         // Monto positivo del evento
-  date: string          // Fecha en formato ISO (YYYY-MM-DDTHH:mm:ss.sssZ)
-  type: 'ingreso' | 'egreso'  // Tipo de evento financiero
-  attachment?: string    // Imagen en base64 (opcional)
-}
+```
+src/
+├── components/              # Componentes reutilizables
+│   ├── BalanceFlow.tsx     # Página principal con resumen
+│   ├── EventForm.tsx       # Formulario para crear/editar eventos
+│   ├── EventModal.tsx      # Ventana para ver detalles de eventos
+│   └── Header.tsx          # Barra de navegación superior
+├── store/                  # Manejo del estado (Redux)
+│   ├── appSlice.ts        # Configuración general (tema, balance)
+│   └── eventsSlice.ts     # Eventos (crear, editar, eliminar)
+├── types/                  # Definiciones de TypeScript
+│   └── event.ts           # Tipo de datos para eventos
+├── utils/                  # Funciones auxiliares
+│   └── balanceCalculations.ts # Cálculos de balance
+└── routes/                 # Páginas de la aplicación
+    ├── index.tsx          # Página principal
+    └── form/$id.tsx       # Página del formulario
 ```
 
-### Validación con Zod
+---
 
-```typescript
-const EventSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1, "El nombre es obligatorio").max(20, "Máximo 20 caracteres"),
-  description: z.string().max(100, "Máximo 100 caracteres").optional(),
-  amount: z.number().positive("El monto debe ser positivo"),
-  date: z.string().datetime(),
-  type: z.enum(['ingreso', 'egreso']),
-  attachment: z.string().optional()
-})
-```
+## 🎨 Personalización
 
-## 🔧 Configuración Avanzada
-
-### Variables de Entorno
-
-La aplicación no requiere variables de entorno específicas para funcionar localmente. Todo se almacena en localStorage.
-
-### Personalización del Tema
-
-Los colores y estilos pueden modificarse en `tailwind.config.js`:
+### Cambiar colores
+El archivo `tailwind.config.js` contiene la configuración de colores:
 
 ```javascript
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: '#faf5ff',
-          500: '#8b5cf6',
-          900: '#581c87',
-        }
-      }
-    }
+// Ejemplo para cambiar el color principal
+colors: {
+  primary: {
+    500: '#8b5cf6',  // Púrpura actual
+    // Cambia por: '#3b82f6' para azul
   }
 }
 ```
 
-## 🚀 Despliegue
+### Modificar el balance inicial por defecto
+En `src/store/appSlice.ts` puedes cambiar:
 
-### Despliegue en Cloudflare Pages
-
-1. **Build de producción**
-   ```bash
-   npm run build
-   ```
-
-2. **Configuración en Cloudflare**
-   - Framework: `React`
-   - Build command: `npm run build`
-   - Build output: `dist`
-
-3. **Deploy automático**
-   - Conecta tu repositorio de GitHub
-   - Cada push despliega automáticamente
-
-### Despliegue en Vercel
-
-```bash
-npm i -g vercel
-vercel --prod
+```typescript
+initialState: {
+  initialBalance: 0,  // Cambia este número
+  theme: 'light'
+}
 ```
 
-### Despliegue en Netlify
+---
 
-```bash
-npm run build
-# Sube la carpeta dist/ a Netlify
+## 🌐 Despliegue (Subir a Internet)
+
+### Opción 1: Cloudflare Pages (Recomendado)
+1. Ve a [Cloudflare Pages](https://pages.cloudflare.com/)
+2. Conecta tu repositorio de GitHub
+3. Configuración:
+   - **Build command**: `npm run build`
+   - **Output directory**: `build`
+4. ¡Listo! Tendrás una URL pública
+
+### Opción 2: Vercel
+1. Ve a [Vercel](https://vercel.com/)
+2. Conecta tu repositorio
+3. Deploy automático
+
+### Opción 3: Netlify
+1. Ve a [Netlify](https://netlify.com/)
+2. Arrastra la carpeta `build` después de ejecutar `npm run build`
+
+---
+
+## 🔧 Información Técnica (Para Desarrolladores)
+
+### Datos que maneja la aplicación
+
+**Evento (Event):**
+```typescript
+{
+  id: string              // Identificador único
+  name: string           // Nombre (máximo 20 caracteres)
+  description?: string   // Descripción opcional (máximo 100 caracteres)
+  amount: number         // Cantidad de dinero (siempre positiva)
+  date: string          // Fecha en formato ISO
+  type: 'ingreso' | 'egreso'  // Tipo de transacción
+  attachment?: string    // Imagen en base64 (opcional)
+}
 ```
 
-## 🧪 Testing
+### Estado de la aplicación (Redux)
 
-```bash
-npm run test        # Ejecuta tests unitarios
-npm run test:watch  # Tests en modo watch
-npm run test:coverage # Coverage de tests
+```typescript
+{
+  app: {
+    theme: 'light' | 'dark',    // Tema actual
+    initialBalance: number       // Balance inicial
+  },
+  events: {
+    items: Event[],             // Lista de eventos
+    loading: boolean,           // ¿Está cargando?
+    error: string | null        // Mensaje de error si hay
+  }
+}
 ```
 
-## 📈 Rendimiento
+### Validación de datos
 
-### Optimizaciones Implementadas
+Usamos **Zod** para validar que los datos sean correctos:
+- El nombre es obligatorio y máximo 20 caracteres
+- La descripción es opcional y máximo 100 caracteres
+- El monto debe ser un número positivo
+- La fecha debe estar en formato correcto
+- El tipo debe ser 'ingreso' o 'egreso'
 
-- **Code Splitting**: División automática del código
-- **Tree Shaking**: Eliminación de código no utilizado
-- **Lazy Loading**: Carga perezosa de componentes
-- **Debouncing**: Optimización de búsquedas
-- **Memoización**: React.memo en componentes críticos
+---
 
-### Métricas de Performance
+## ❓ Preguntas Frecuentes
 
-- **First Contentful Paint**: < 1.5s
-- **Time to Interactive**: < 3s
-- **Bundle Size**: < 500KB gzipped
+### ¿Se pierden mis datos si cierro el navegador?
+**No.** Todos tus datos se guardan automáticamente en tu navegador (localStorage).
 
-## 🔐 Seguridad
+### ¿Puedo usar la aplicación sin internet?
+**Sí.** Una vez que cargas la aplicación, funciona sin internet. Solo necesitas internet para la primera carga.
 
-- **Validación client-side**: Zod schemas
-- **Sanitización de datos**: Prevención XSS
-- **No dependencias vulnerables**: Audit regular
-- **HTTPS only**: Redirección automática en producción
+### ¿En qué dispositivos funciona?
+**Todos.** La aplicación es responsiva y funciona en:
+- 💻 Computadoras
+- 📱 Teléfonos móviles
+- 📱 Tablets
 
-## 🤝 Contribución
+### ¿Cómo cambio entre tema claro y oscuro?
+Haz clic en el ícono del sol/luna en la barra superior.
 
-1. **Fork el proyecto**
-2. **Crea una rama feature**
+### ¿Puedo editar un evento después de crearlo?
+**Sí.** Haz clic en el ícono del lápiz (azul) al lado de cualquier evento.
+
+### ¿Puedo eliminar un evento?
+**Sí.** Haz clic en el ícono de la basura (rojo) al lado de cualquier evento.
+
+### ¿Hay límite de eventos que puedo crear?
+**No.** Puedes crear tantos eventos como quieras.
+
+---
+
+## 🎓 Este Proyecto Fue Creado Para
+
+**Bootcamp de React - ESPOL**
+
+### Lo que aprendí desarrollando Walletfy:
+- ✅ **React 19**: Componentes, hooks, estado
+- ✅ **TypeScript**: Tipado de datos para código más seguro
+- ✅ **Redux Toolkit**: Manejo del estado global
+- ✅ **TailwindCSS**: Estilos modernos y responsivos
+- ✅ **TanStack Router**: Navegación entre páginas
+- ✅ **Zod**: Validación de datos
+- ✅ **Vite**: Herramientas de desarrollo modernas
+- ✅ **Git & GitHub**: Control de versiones
+- ✅ **Despliegue**: Publicar aplicaciones en internet
+
+### Funcionalidades implementadas:
+- ✅ CRUD completo (Crear, Leer, Actualizar, Eliminar)
+- ✅ Persistencia de datos
+- ✅ Búsqueda en tiempo real
+- ✅ Diseño responsivo
+- ✅ Tema claro/oscuro
+- ✅ Validación de formularios
+- ✅ Carga de archivos (imágenes)
+
+---
+
+## 🤝 Contribuir al Proyecto
+
+¿Quieres mejorar Walletfy? ¡Genial!
+
+### Para principiantes:
+1. **Haz un Fork** del proyecto en GitHub
+2. **Clona** tu fork a tu computadora
+3. **Crea una rama nueva**:
    ```bash
-   git checkout -b feature/nueva-funcionalidad
+   git checkout -b mi-nueva-funcionalidad
    ```
-3. **Commit tus cambios**
+4. **Haz tus cambios**
+5. **Sube tus cambios**:
    ```bash
-   git commit -m 'Add: nueva funcionalidad increíble'
+   git add .
+   git commit -m "Agregué nueva funcionalidad"
+   git push origin mi-nueva-funcionalidad
    ```
-4. **Push a la rama**
-   ```bash
-   git push origin feature/nueva-funcionalidad
-   ```
-5. **Abre un Pull Request**
+6. **Crea un Pull Request** en GitHub
 
-### Estándares de Código
+### Ideas para contribuir:
+- � Agregar gráficos
+- 📂 Exportar datos a Excel/PDF
+- 🏷️ Sistema de categorías
+- 🔔 Recordatorios
+- 📱 Mejorar la experiencia móvil
 
-- **ESLint**: Configuración estricta
-- **Prettier**: Formateo automático
-- **Conventional Commits**: Formato de commits
-- **TypeScript strict**: Tipado completo
-
-## 📝 Changelog
-
-### v2.5.0 (Actual)
-- ✅ Implementación completa de Redux Toolkit
-- ✅ Formularios con validación Zod
-- ✅ Tema claro/oscuro con persistencia
-- ✅ Carga de imágenes en base64
-- ✅ Búsqueda con debouncing
-- ✅ Diseño completamente responsivo
-- ✅ Cálculos automáticos de balance
-- ✅ Organización por meses
-- ✅ Persistencia en localStorage
+---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la licencia **MIT**. Ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y compartirlo libremente.
+
+---
+
+## 👨‍💻 Contacto
+
+**Desarrollado por:** [Tu Nombre]
+**Para:** Bootcamp de React - ESPOL
+**Año:** 2025
+
+**GitHub:** [andatoba/ProyectReactWall](https://github.com/andatoba/ProyectReactWall)
 
 ---
 
 <div align="center">
 
-**Desarrollado con ❤️ para el Bootcamp de React - ESPOL**
+**¡Gracias por usar Walletfy! 💜**
 
-[⭐ Dar una estrella](https://github.com/tu-usuario/walletfy-2.5) • [🐛 Reportar bug](https://github.com/tu-usuario/walletfy-2.5/issues) • [💡 Solicitar feature](https://github.com/tu-usuario/walletfy-2.5/issues)
+Si te gustó el proyecto, ¡dale una ⭐ en GitHub!
 
 </div>
-
-## 📚 Documentación Técnica
-
-### Principios de Desarrollo
-
-- **Single Responsibility**: Cada componente tiene una responsabilidad específica
-- **Composición**: Uso extensivo de composición sobre herencia
-- **Inmutabilidad**: Estado manejado de forma inmutable con Redux Toolkit
-- **Tipado Fuerte**: TypeScript en modo estricto para mayor robustez
-- **Performance First**: Optimizaciones desde el diseño inicial
-
-### Arquitectura de Estado
-
-```typescript
-// Store Structure
-{
-  app: {
-    theme: 'light' | 'dark',
-    initialBalance: number
-  },
-  events: {
-    items: Event[],
-    loading: boolean,
-    error: string | null
-  }
-}
-```
-
-## 🎯 Roadmap y Mejoras Futuras
-
-- [ ] **Exportar datos**: PDF, Excel, CSV
-- [ ] **Categorías**: Clasificación avanzada de eventos
-- [ ] **Gráficos**: Visualización con charts
-- [ ] **Notificaciones**: Recordatorios y alertas
-- [ ] **Sincronización**: Backup en la nube
-- [ ] **Análisis**: Reportes financieros avanzados
-
----
-
-> **Nota**: Este proyecto fue desarrollado como parte del **Bootcamp de React de ESPOL**, cumpliendo con todos los requisitos técnicos y funcionales especificados.

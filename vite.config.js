@@ -14,6 +14,9 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
+  build: {
+    outDir: 'build'
+  },
   test: {
     globals: true,
     environment: 'jsdom',
