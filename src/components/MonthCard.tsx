@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, DollarSign, TrendingUp, TrendingDown, Edit, Trash2 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import type { MonthlyBalance } from '../types/event'
 import { formatDate } from '../utils/balanceCalculations'
 import EventModal from './EventModal'
@@ -15,10 +16,15 @@ const MonthCard = ({ monthBalance }: MonthCardProps) => {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const handleEventClick = (event: any) => {
     setSelectedEvent(event)
     setIsModalOpen(true)
+  }
+
+  const handleEditEvent = (eventId: string) => {
+    navigate({ to: `/form/${eventId}` })
   }
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -156,8 +162,7 @@ const MonthCard = ({ monthBalance }: MonthCardProps) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          // TODO: Navigate to edit form
-                          console.log('Edit event:', event.id)
+                          handleEditEvent(event.id)
                         }}
                         className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 rounded"
                         title="Editar evento"
