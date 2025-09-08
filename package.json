@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
-    "build": "npx tsc && vite build",
+    "build": "npx --package=typescript tsc && vite build",
     "preview": "vite preview",
     "serve": "vite preview",
     "test": "vitest run",
