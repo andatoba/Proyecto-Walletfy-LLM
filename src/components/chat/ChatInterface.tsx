@@ -277,8 +277,18 @@ export default function ChatInterface() {
   const [showConfig, setShowConfig] = useState(false)
   const [context, setContext] = useState<WalletfyContext | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('')
   const [streamingEnabled, setStreamingEnabled] = useState(true) // Nueva opción para habilitar/deshabilitar streaming
+  
+  // Detectar entorno y configurar API endpoint
+  const getApiEndpoint = () => {
+    if (typeof window !== 'undefined') {
+      // En producción usa el mismo dominio, en desarrollo usa localhost
+      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      return isDev ? 'http://localhost:4000/api/completion' : '/api/completion'
+    }
+    return '/api/completion'
+  }
+  
   const [config, setConfig] = useState<ChatConfig>({
     model: 'gpt-3.5-turbo',
     temperature: 0.7,
@@ -287,7 +297,7 @@ export default function ChatInterface() {
     reasoningEffort: 'medium',
     maxTokens: 1000,
     systemPrompt: 'Eres un asistente financiero especializado en la aplicación Walletfy. Tu trabajo es ayudar a los usuarios a entender y gestionar mejor sus finanzas personales basándote en los datos de su aplicación. Proporciona consejos útiles, análisis de patrones de gasto, y responde preguntas específicas sobre sus transacciones e ingresos.',
-    apiEndpoint: 'http://localhost:4000/api/completion'
+    apiEndpoint: getApiEndpoint()
   })
 
   // Seleccionar datos del store de Redux
@@ -341,7 +351,6 @@ export default function ChatInterface() {
     // Usar streaming si está habilitado
     if (streamingEnabled) {
       setIsStreaming(true)
-      setCurrentStreamingMessage('')
       
       // Crear mensaje temporal para streaming
       const streamingMessageId = Date.now().toString() + '-streaming'
@@ -356,25 +365,22 @@ export default function ChatInterface() {
       sendMessageWithStreaming(
         inputValue,
         config,
-        context,
+        context!,
         // onChunk: actualizar el mensaje en tiempo real
         (chunk: string) => {
-          setCurrentStreamingMessage(prev => {
-            const newContent = prev + chunk
-            setMessages((msgs) => 
-              msgs.map(msg => 
-                msg.id === streamingMessageId 
-                  ? { ...msg, content: newContent }
-                  : msg
-              )
-            )
-            return newContent
+          setMessages((msgs) => {
+            return msgs.map(msg => {
+              if (msg.id === streamingMessageId) {
+                const newContent = msg.content + chunk
+                return { ...msg, content: newContent }
+              }
+              return msg
+            })
           })
         },
         // onComplete: finalizar streaming
         (fullMessage: string) => {
           setIsStreaming(false)
-          setCurrentStreamingMessage('')
           setMessages((msgs) => 
             msgs.map(msg => 
               msg.id === streamingMessageId 
@@ -386,7 +392,6 @@ export default function ChatInterface() {
         // onError: manejar errores de streaming
         (error: string) => {
           setIsStreaming(false)
-          setCurrentStreamingMessage('')
           const errorMessage: Message = {
             id: Date.now().toString() + '-error',
             content: `❌ Error de streaming: ${error}`,

@@ -1,0 +1,14 @@
+# Configuración para Cloudflare Pages
+name = "walletfy-llm"
+compatibility_date = "2024-11-01"
+
+# Para Cloudflare Pages
+[env.production]
+main = "dist/index.html"
+
+# Configuración de build
+build = { command = "npm run build", cwd = ".", watch_dir = "src" }
+
+# Variables de entorno (puedes agregar más aquí)
+[vars]
+NODE_ENV = "production"
