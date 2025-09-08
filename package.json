@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
-    "build": "npx --package=typescript tsc && vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "serve": "vite preview",
     "test": "vitest run",
@@ -49,7 +49,11 @@
     "tailwindcss": "^4.0.6",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.1.0",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",
@@ -57,15 +61,11 @@
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.5.3",
-    "typescript": "^5.7.2",
-    "vite": "^6.1.0",
-    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4"
   }
