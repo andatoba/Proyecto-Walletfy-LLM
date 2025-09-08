@@ -1,9 +1,9 @@
-import { Moon, Sun, Plus, RotateCcw } from 'lucide-react'
+import { MessageCircle, Moon, Plus, RotateCcw, Sun } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { toggleTheme, setInitialBalance } from '../store/appSlice'
+import { setInitialBalance, toggleTheme } from '../store/appSlice'
 import { setEvents } from '../store/eventsSlice'
 import { sampleEvents } from '../data/sampleEvents'
-import { Link } from '@tanstack/react-router'
 
 export default function Header() {
   const dispatch = useAppDispatch()
@@ -46,6 +46,15 @@ export default function Header() {
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Event
+            </Link>
+
+            {/* Chat Assistant Button */}
+            <Link
+              to="/chat"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Chat IA
             </Link>
 
             {/* Reset Data Button */}

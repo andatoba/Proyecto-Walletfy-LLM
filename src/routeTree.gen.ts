@@ -11,12 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ChatImport } from './routes/chat'
 import { Route as IndexImport } from './routes/index'
 import { Route as FormEventFormImport } from './routes/form/event-form'
 import { Route as FormIdNewImport } from './routes/form/$id-new'
 import { Route as FormIdImport } from './routes/form/$id'
 
 // Create/Update Routes
+
+const ChatRoute = ChatImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -53,6 +60,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatImport
+      parentRoute: typeof rootRoute
+    }
     '/form/$id': {
       id: '/form/$id'
       path: '/form/$id'
@@ -81,6 +95,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/form/$id': typeof FormIdRoute
   '/form/$id-new': typeof FormIdNewRoute
   '/form/event-form': typeof FormEventFormRoute
@@ -88,6 +103,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/form/$id': typeof FormIdRoute
   '/form/$id-new': typeof FormIdNewRoute
   '/form/event-form': typeof FormEventFormRoute
@@ -96,6 +112,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/form/$id': typeof FormIdRoute
   '/form/$id-new': typeof FormIdNewRoute
   '/form/event-form': typeof FormEventFormRoute
@@ -103,15 +120,22 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/form/$id' | '/form/$id-new' | '/form/event-form'
+  fullPaths: '/' | '/chat' | '/form/$id' | '/form/$id-new' | '/form/event-form'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/form/$id' | '/form/$id-new' | '/form/event-form'
-  id: '__root__' | '/' | '/form/$id' | '/form/$id-new' | '/form/event-form'
+  to: '/' | '/chat' | '/form/$id' | '/form/$id-new' | '/form/event-form'
+  id:
+    | '__root__'
+    | '/'
+    | '/chat'
+    | '/form/$id'
+    | '/form/$id-new'
+    | '/form/event-form'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChatRoute: typeof ChatRoute
   FormIdRoute: typeof FormIdRoute
   FormIdNewRoute: typeof FormIdNewRoute
   FormEventFormRoute: typeof FormEventFormRoute
@@ -119,6 +143,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChatRoute: ChatRoute,
   FormIdRoute: FormIdRoute,
   FormIdNewRoute: FormIdNewRoute,
   FormEventFormRoute: FormEventFormRoute,
@@ -135,6 +160,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/chat",
         "/form/$id",
         "/form/$id-new",
         "/form/event-form"
@@ -142,6 +168,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/chat": {
+      "filePath": "chat.tsx"
     },
     "/form/$id": {
       "filePath": "form/$id.tsx"
