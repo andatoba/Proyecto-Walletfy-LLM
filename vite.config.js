@@ -15,7 +15,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   build: {
-    outDir: 'build'
+    outDir: 'dist'
   },
   test: {
     globals: true,
