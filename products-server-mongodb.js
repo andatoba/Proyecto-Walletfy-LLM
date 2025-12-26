@@ -7,10 +7,88 @@ import Logger from './utils/logger.js';
 const app = express();
 const PORT = 3030;
 const MONGODB_URI = 'mongodb://localhost:27017/walletfy_products';
+const API_KEYS = {
+  read: process.env.WALLETFY_READ_KEY,
+  write: process.env.WALLETFY_WRITE_KEY
+};
+
+mongoose.set('sanitizeFilter', true);
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
+
+const sanitizeMongoInput = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(sanitizeMongoInput);
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).reduce((acc, key) => {
+      if (key.startsWith('$') || key.includes('.')) {
+        return acc;
+      }
+      acc[key] = sanitizeMongoInput(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
+};
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const pickFields = (source, allowedFields) => {
+  return allowedFields.reduce((acc, field) => {
+    if (Object.prototype.hasOwnProperty.call(source, field)) {
+      acc[field] = source[field];
+    }
+    return acc;
+  }, {});
+};
+
+const getApiKey = (req) => {
+  const authHeader = req.get('authorization') || req.get('x-api-key');
+  if (!authHeader) return null;
+  if (authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.slice(7).trim();
+  }
+  return authHeader.trim();
+};
+
+const requireApiKey = (role) => (req, res, next) => {
+  if (!API_KEYS.write) {
+    Logger.error('Falta configurar WALLETFY_WRITE_KEY en el entorno.');
+    return res.status(500).json(createResponse(false, null, '', 'Servidor no configurado'));
+  }
+
+  const apiKey = getApiKey(req);
+  if (!apiKey) {
+    return res.status(401).json(createResponse(false, null, '', 'API key requerida'));
+  }
+
+  const readKeys = [API_KEYS.read, API_KEYS.write].filter(Boolean);
+  const isAuthorized = role === 'read'
+    ? readKeys.includes(apiKey)
+    : apiKey === API_KEYS.write;
+
+  if (!isAuthorized) {
+    return res.status(403).json(createResponse(false, null, '', 'API key inválida'));
+  }
+
+  return next();
+};
+
+const validCategories = Product.schema.path('category').enumValues;
+const allowedProductFields = ['name', 'description', 'price', 'category', 'imageUrl', 'inStock'];
+
+app.use((req, res, next) => {
+  if (req.body) {
+    req.body = sanitizeMongoInput(req.body);
+  }
+  if (req.query) {
+    req.query = sanitizeMongoInput(req.query);
+  }
+  next();
+});
 
 // Middleware para logging de requests
 app.use((req, res, next) => {
@@ -64,20 +142,26 @@ const buildSearchFilters = (query) => {
   const filters = {};
   
   // Filtro por nombre (búsqueda parcial, case insensitive)
-  if (query.name) {
-    filters.name = { $regex: query.name, $options: 'i' };
+  if (typeof query.name === 'string' && query.name.trim()) {
+    const safeName = escapeRegex(query.name.trim().slice(0, 50));
+    filters.name = { $regex: safeName, $options: 'i' };
   }
   
   // Filtro por categoría
-  if (query.category) {
+  if (typeof query.category === 'string' && validCategories.includes(query.category)) {
     filters.category = query.category;
   }
   
   // Filtro por rango de precios
   if (query.minPrice || query.maxPrice) {
     filters.price = {};
-    if (query.minPrice) filters.price.$gte = parseFloat(query.minPrice);
-    if (query.maxPrice) filters.price.$lte = parseFloat(query.maxPrice);
+    const minPrice = Number.parseFloat(query.minPrice);
+    const maxPrice = Number.parseFloat(query.maxPrice);
+    if (Number.isFinite(minPrice)) filters.price.$gte = minPrice;
+    if (Number.isFinite(maxPrice)) filters.price.$lte = maxPrice;
+    if (Object.keys(filters.price).length === 0) {
+      delete filters.price;
+    }
   }
   
   // Filtro por disponibilidad
@@ -91,7 +175,7 @@ const buildSearchFilters = (query) => {
 // Routes
 
 // GET /api/products - Listar productos con paginación, filtros y ordenamiento
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', requireApiKey('read'), async (req, res) => {
   try {
     const {
       page = 1,
@@ -154,7 +238,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 // GET /api/products/:id - Obtener producto por ID
-app.get('/api/products/:id', async (req, res) => {
+app.get('/api/products/:id', requireApiKey('read'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -177,9 +261,12 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // POST /api/products - Crear nuevo producto
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', requireApiKey('write'), async (req, res) => {
   try {
-    const productData = req.body;
+    const productData = pickFields(req.body, allowedProductFields);
+    if (Object.keys(productData).length === 0) {
+      return res.status(400).json(createResponse(false, null, '', 'Datos inválidos'));
+    }
     
     const newProduct = new Product(productData);
     const savedProduct = await newProduct.save();
@@ -195,19 +282,18 @@ app.post('/api/products', async (req, res) => {
 });
 
 // PUT /api/products/:id - Actualizar producto
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', requireApiKey('write'), async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const updateData = pickFields(req.body, allowedProductFields);
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json(createResponse(false, null, '', 'ID inválido'));
     }
     
-    // Remover campos que no deben ser actualizados
-    delete updateData._id;
-    delete updateData.createdAt;
-    delete updateData.isDeleted;
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json(createResponse(false, null, '', 'No hay campos válidos para actualizar'));
+    }
     
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -233,7 +319,7 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 // DELETE /api/products/:id - Eliminar producto (eliminación lógica)
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', requireApiKey('write'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -262,7 +348,7 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // GET /api/health - Health check con estado de MongoDB
-app.get('/api/health', async (req, res) => {
+app.get('/api/health', requireApiKey('read'), async (req, res) => {
   try {
     // Verificar conexión a MongoDB
     const dbState = mongoose.connection.readyState;

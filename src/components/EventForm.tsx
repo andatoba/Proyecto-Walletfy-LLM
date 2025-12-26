@@ -48,8 +48,6 @@ const EventForm = () => {
     e.preventDefault()
     
     try {
-      console.log('Formulario enviado con valores:', formData)
-      
       // Basic validation
       if (!formData.name.trim()) {
         alert('El nombre es obligatorio')
@@ -83,25 +81,20 @@ const EventForm = () => {
         date: new Date(formData.date).toISOString(),
         attachment,
       }
-      
-      console.log('Datos del evento a enviar:', eventData)
 
       if (isEditing && existingEvent) {
-        console.log('Actualizando evento:', existingEvent.id)
         await dispatch(updateEvent({
           ...eventData,
           id: existingEvent.id,
         }))
       } else {
-        console.log('Creando nuevo evento')
         await dispatch(createEvent(eventData))
       }
 
-      console.log('Navegando a la página principal')
       navigate({ to: '/' })
     } catch (error) {
-      console.error('Error saving event:', error)
-      alert('Error al guardar el evento: ' + error)
+      const message = error instanceof Error ? error.message : 'Error desconocido'
+      alert('Error al guardar el evento: ' + message)
     }
   }
 

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 
+export type ReasoningEffort = 'minimal' | 'low' | 'medium' | 'high'
+
 export interface ChatConfig {
   model: string
   temperature: number
   topP: number
   topK: number
-  reasoningEffort: string
+  reasoningEffort: ReasoningEffort
   maxTokens: number
   systemPrompt: string
   apiEndpoint: string
@@ -25,7 +27,11 @@ const AVAILABLE_MODELS = [
   { id: 'llama-2-70b', name: 'Llama 2 70B' },
 ]
 
-const REASONING_EFFORT_OPTIONS = [
+const REASONING_EFFORT_OPTIONS: Array<{
+  id: ReasoningEffort
+  name: string
+  description: string
+}> = [
   { id: 'minimal', name: 'Mínimo', description: 'Respuestas muy rápidas y básicas' },
   { id: 'low', name: 'Bajo', description: 'Respuestas rápidas y directas' },
   { id: 'medium', name: 'Medio', description: 'Balance entre velocidad y razonamiento' },
@@ -62,7 +68,7 @@ export default function ConfigurationPanel({
     }
     
     // Validar reasoning effort
-    const validEfforts = ['minimal', 'low', 'medium', 'high']
+    const validEfforts: ReasoningEffort[] = ['minimal', 'low', 'medium', 'high']
     if (!validEfforts.includes(validatedConfig.reasoningEffort)) {
       validatedConfig.reasoningEffort = 'medium'
     }

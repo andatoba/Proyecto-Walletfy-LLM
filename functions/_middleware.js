@@ -3,6 +3,8 @@ export async function onRequest(context) {
   try {
     const { request } = context;
     const url = new URL(request.url);
+    const MAX_INPUT_LENGTH = 4000;
+    const chatApiKey = context.env?.WALLETFY_CHAT_KEY;
     
     // Configurar CORS
     const corsHeaders = {
@@ -23,6 +25,15 @@ export async function onRequest(context) {
     if (!url.pathname.startsWith('/api/')) {
       return;
     }
+
+    const getApiKey = () => {
+      const authHeader = request.headers.get('authorization') || request.headers.get('x-api-key');
+      if (!authHeader) return null;
+      if (authHeader.toLowerCase().startsWith('bearer ')) {
+        return authHeader.slice(7).trim();
+      }
+      return authHeader.trim();
+    };
 
     // Función para generar respuestas inteligentes
     function getSmartResponse(input = '', contextData = {}) {
@@ -55,9 +66,51 @@ export async function onRequest(context) {
     // Endpoint principal de completion
     if (url.pathname === '/api/completion' && request.method === 'POST') {
       try {
+        if (!chatApiKey) {
+          return new Response(JSON.stringify({ error: 'Servidor no configurado' }), {
+            status: 500,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+
+        const apiKey = getApiKey();
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'API key requerida' }), {
+            status: 401,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+        if (apiKey !== chatApiKey) {
+          return new Response(JSON.stringify({ error: 'API key inválida' }), {
+            status: 403,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+
         const body = await request.json().catch(() => ({}));
         const input = body.input || body.message || '';
         const context = body.context || {};
+
+        if (typeof input === 'string' && input.length > MAX_INPUT_LENGTH) {
+          return new Response(JSON.stringify({ 
+            error: 'El input supera el tamaño permitido'
+          }), {
+            status: 400,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
         
         const response = getSmartResponse(input, context);
         
@@ -88,9 +141,51 @@ export async function onRequest(context) {
     // Endpoint para streaming
     if (url.pathname === '/api/completion/stream' && request.method === 'POST') {
       try {
+        if (!chatApiKey) {
+          return new Response(JSON.stringify({ error: 'Servidor no configurado' }), {
+            status: 500,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+
+        const apiKey = getApiKey();
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'API key requerida' }), {
+            status: 401,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+        if (apiKey !== chatApiKey) {
+          return new Response(JSON.stringify({ error: 'API key inválida' }), {
+            status: 403,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
+
         const body = await request.json().catch(() => ({}));
         const input = body.input || body.message || '';
         const context = body.context || {};
+
+        if (typeof input === 'string' && input.length > MAX_INPUT_LENGTH) {
+          return new Response(JSON.stringify({ 
+            error: 'El input supera el tamaño permitido'
+          }), {
+            status: 400,
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            }
+          });
+        }
         
         const response = getSmartResponse(input, context);
         

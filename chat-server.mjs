@@ -2,10 +2,36 @@ import express from 'express';
 import cors from 'cors';
 
 const app = express();
+const CHAT_API_KEY = process.env.WALLETFY_CHAT_KEY;
+const MAX_INPUT_LENGTH = 4000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
+
+const getApiKey = (req) => {
+  const authHeader = req.get('authorization') || req.get('x-api-key');
+  if (!authHeader) return null;
+  if (authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.slice(7).trim();
+  }
+  return authHeader.trim();
+};
+
+const requireApiKey = (req, res, next) => {
+  if (!CHAT_API_KEY) {
+    return res.status(500).json({ error: 'Servidor no configurado' });
+  }
+
+  const apiKey = getApiKey(req);
+  if (!apiKey) {
+    return res.status(401).json({ error: 'API key requerida' });
+  }
+  if (apiKey !== CHAT_API_KEY) {
+    return res.status(403).json({ error: 'API key inválida' });
+  }
+  return next();
+};
 
 // Respuestas simuladas inteligentes para diferentes tipos de consultas sobre Walletfy
 const getSmartResponse = (input, context) => {
@@ -107,14 +133,18 @@ Puedes preguntarme sobre:
 };
 
 // Endpoint para streaming de respuestas
-app.post('/api/completion/stream', (req, res) => {
+app.post('/api/completion/stream', requireApiKey, (req, res) => {
   console.log('🎯 Consulta de streaming recibida al asistente Walletfy:');
   console.log('===============================');
   console.log('📝 Input:', req.body.input);
   console.log('⚙️ Params:', JSON.stringify(req.body.params, null, 2));
   
   const params = req.body.params || {};
-  const input = req.body.input || '';
+  const input = typeof req.body.input === 'string' ? req.body.input : '';
+
+  if (input.length > MAX_INPUT_LENGTH) {
+    return res.status(400).json({ error: 'El input supera el tamaño permitido' });
+  }
   
   // Validar parámetros (misma lógica que el endpoint normal)
   const validations = [];
@@ -242,14 +272,18 @@ app.post('/api/completion/stream', (req, res) => {
 });
 
 // Endpoint para el chat con contexto inteligente (modo normal)
-app.post('/api/completion', (req, res) => {
+app.post('/api/completion', requireApiKey, (req, res) => {
   console.log('🎯 Consulta recibida al asistente Walletfy:');
   console.log('===============================');
   console.log('📝 Input:', req.body.input);
   console.log('⚙️ Params:', JSON.stringify(req.body.params, null, 2));
   
   const params = req.body.params || {};
-  const input = req.body.input || '';
+  const input = typeof req.body.input === 'string' ? req.body.input : '';
+
+  if (input.length > MAX_INPUT_LENGTH) {
+    return res.status(400).json({ error: 'El input supera el tamaño permitido' });
+  }
   
   // Validar parámetros
   const validations = [];

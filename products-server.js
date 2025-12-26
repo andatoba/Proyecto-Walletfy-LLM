@@ -62,10 +62,82 @@ const sampleProducts = [
 
 const app = express();
 const PORT = 3030;
+const API_KEYS = {
+  read: process.env.WALLETFY_READ_KEY,
+  write: process.env.WALLETFY_WRITE_KEY
+};
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
+
+const sanitizeInput = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(sanitizeInput);
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).reduce((acc, key) => {
+      if (key.startsWith('$') || key.includes('.')) {
+        return acc;
+      }
+      acc[key] = sanitizeInput(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
+};
+
+const pickFields = (source, allowedFields) => {
+  return allowedFields.reduce((acc, field) => {
+    if (Object.prototype.hasOwnProperty.call(source, field)) {
+      acc[field] = source[field];
+    }
+    return acc;
+  }, {});
+};
+
+const getApiKey = (req) => {
+  const authHeader = req.get('authorization') || req.get('x-api-key');
+  if (!authHeader) return null;
+  if (authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.slice(7).trim();
+  }
+  return authHeader.trim();
+};
+
+const requireApiKey = (role) => (req, res, next) => {
+  if (!API_KEYS.write) {
+    return res.status(500).json(createResponse(false, null, '', 'Servidor no configurado'));
+  }
+
+  const apiKey = getApiKey(req);
+  if (!apiKey) {
+    return res.status(401).json(createResponse(false, null, '', 'API key requerida'));
+  }
+
+  const readKeys = [API_KEYS.read, API_KEYS.write].filter(Boolean);
+  const isAuthorized = role === 'read'
+    ? readKeys.includes(apiKey)
+    : apiKey === API_KEYS.write;
+
+  if (!isAuthorized) {
+    return res.status(403).json(createResponse(false, null, '', 'API key inválida'));
+  }
+
+  return next();
+};
+
+const allowedProductFields = ['name', 'description', 'price', 'category', 'imageUrl', 'inStock'];
+
+app.use((req, res, next) => {
+  if (req.body) {
+    req.body = sanitizeInput(req.body);
+  }
+  if (req.query) {
+    req.query = sanitizeInput(req.query);
+  }
+  next();
+});
 
 // In-memory storage for products (starts with sample data)
 let products = [...sampleProducts];
@@ -78,11 +150,11 @@ const validateProductData = (productData, isUpdate = false) => {
     errors.push('El nombre es obligatorio');
   }
   
-  if (productData.name && (productData.name.length < 1 || productData.name.length > 50)) {
+  if (productData.name && (typeof productData.name !== 'string' || productData.name.length < 1 || productData.name.length > 50)) {
     errors.push('El nombre debe tener entre 1 y 50 caracteres');
   }
   
-  if (productData.description && productData.description.length > 200) {
+  if (productData.description && (typeof productData.description !== 'string' || productData.description.length > 200)) {
     errors.push('La descripción debe tener máximo 200 caracteres');
   }
   
@@ -99,7 +171,7 @@ const validateProductData = (productData, isUpdate = false) => {
     errors.push('La categoría es obligatoria');
   }
   
-  if (productData.category && !validCategories.includes(productData.category)) {
+  if (productData.category && (typeof productData.category !== 'string' || !validCategories.includes(productData.category))) {
     errors.push('Categoría inválida');
   }
   
@@ -123,7 +195,7 @@ const createResponse = (success, data = null, message = '', error = '') => {
 // Routes
 
 // GET /api/products - Listar todos los productos
-app.get('/api/products', (req, res) => {
+app.get('/api/products', requireApiKey('read'), (req, res) => {
   try {
     res.json(createResponse(true, products, 'Productos obtenidos exitosamente'));
   } catch (err) {
@@ -132,7 +204,7 @@ app.get('/api/products', (req, res) => {
 });
 
 // GET /api/products/:id - Obtener producto por ID
-app.get('/api/products/:id', (req, res) => {
+app.get('/api/products/:id', requireApiKey('read'), (req, res) => {
   try {
     const { id } = req.params;
     const product = products.find(p => p.id === id);
@@ -148,9 +220,12 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // POST /api/products - Crear nuevo producto
-app.post('/api/products', (req, res) => {
+app.post('/api/products', requireApiKey('write'), (req, res) => {
   try {
-    const productData = req.body;
+    const productData = pickFields(req.body, allowedProductFields);
+    if (Object.keys(productData).length === 0) {
+      return res.status(400).json(createResponse(false, null, '', 'Datos inválidos'));
+    }
     const validationErrors = validateProductData(productData);
     
     if (validationErrors.length > 0) {
@@ -178,14 +253,18 @@ app.post('/api/products', (req, res) => {
 });
 
 // PUT /api/products/:id - Actualizar producto
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', requireApiKey('write'), (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const updateData = pickFields(req.body, allowedProductFields);
     
     const productIndex = products.findIndex(p => p.id === id);
     if (productIndex === -1) {
       return res.status(404).json(createResponse(false, null, '', 'Producto no encontrado'));
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json(createResponse(false, null, '', 'No hay campos válidos para actualizar'));
     }
     
     const validationErrors = validateProductData(updateData, true);
@@ -210,7 +289,7 @@ app.put('/api/products/:id', (req, res) => {
 });
 
 // DELETE /api/products/:id - Eliminar producto
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', requireApiKey('write'), (req, res) => {
   try {
     const { id } = req.params;
     const productIndex = products.findIndex(p => p.id === id);
@@ -229,7 +308,7 @@ app.delete('/api/products/:id', (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/api/health', requireApiKey('read'), (req, res) => {
   res.json(createResponse(true, { status: 'OK', timestamp: new Date().toISOString() }, 'Servidor funcionando correctamente'));
 });
 

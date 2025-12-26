@@ -10,6 +10,13 @@ API REST completa para gestión de productos con persistencia en MongoDB utiliza
 - Node.js v16 o superior
 - MongoDB (local o remoto)
 
+### Variables de entorno (seguridad)
+Define llaves para control de acceso:
+```bash
+export WALLETFY_READ_KEY="clave-lectura"
+export WALLETFY_WRITE_KEY="clave-escritura"
+```
+
 ### Instalación
 ```bash
 # Clonar el repositorio
@@ -29,6 +36,8 @@ npm run backend:mongodb
 ## 🌐 Endpoints
 
 ### Base URL: `http://localhost:3030`
+
+Todas las solicitudes requieren `x-api-key` (o `Authorization: Bearer <token>`).
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|

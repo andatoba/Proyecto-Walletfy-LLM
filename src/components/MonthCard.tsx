@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, DollarSign, TrendingUp, TrendingDown, Edit, Trash2 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import type { MonthlyBalance } from '../types/event'
+import type { Event, MonthlyBalance } from '../types/event'
 import { formatDate } from '../utils/balanceCalculations'
 import EventModal from './EventModal'
 import { useAppDispatch } from '../store/hooks'
@@ -13,12 +13,12 @@ interface MonthCardProps {
 
 const MonthCard = ({ monthBalance }: MonthCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const handleEventClick = (event: any) => {
+  const handleEventClick = (event: Event) => {
     setSelectedEvent(event)
     setIsModalOpen(true)
   }

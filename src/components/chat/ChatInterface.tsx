@@ -3,7 +3,8 @@ import { useMutation } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { calculateMonthlyBalances } from '../../utils/balanceCalculations'
 import ConfigurationPanel from './ConfigurationPanel'
-import type { ChatConfig } from './ConfigurationPanel'
+import type { ChatConfig, ReasoningEffort } from './ConfigurationPanel'
+import type { Event } from '../../types/event'
 import type { RootState } from '../../store'
 
 interface Message {
@@ -41,8 +42,22 @@ interface WalletfyContext {
   }>
 }
 
+interface ChatParams {
+  temperature: number
+  reasoning_effort: ReasoningEffort
+  top_p?: number
+  top_k?: number
+}
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message
+  }
+  return 'Error desconocido'
+}
+
 // Función para crear el contexto de Walletfy
-function createWalletfyContext(events: Array<any>, initialBalance: number): WalletfyContext {
+function createWalletfyContext(events: Event[], initialBalance: number): WalletfyContext {
   const monthlyBalances = calculateMonthlyBalances(events, initialBalance)
   
   // Calcular totales
@@ -115,7 +130,7 @@ ${context.recentEvents.map((event, index) =>
 Usa esta información para proporcionar respuestas precisas y útiles sobre las finanzas del usuario. Puedes analizar patrones, dar consejos, identificar tendencias y responder preguntas específicas basándote en estos datos reales.`
 
   // Crear el objeto params según el formato requerido
-  const params: any = {
+  const params: ChatParams = {
     temperature: validatedConfig.temperature,
     reasoning_effort: validatedConfig.reasoningEffort,
   }
@@ -133,11 +148,19 @@ Usa esta información para proporcionar respuestas precisas y útiles sobre las 
     params: params
   }
 
+  const chatApiKey = typeof import.meta.env.VITE_CHAT_API_KEY === 'string'
+    ? import.meta.env.VITE_CHAT_API_KEY
+    : ''
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (chatApiKey) {
+    headers['x-api-key'] = chatApiKey
+  }
+
   const response = await fetch(validatedConfig.apiEndpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(requestBody),
   })
 
@@ -190,7 +213,7 @@ ${context.recentEvents.map((event, index) =>
 Usa esta información para proporcionar respuestas precisas y útiles sobre las finanzas del usuario. Puedes analizar patrones, dar consejos, identificar tendencias y responder preguntas específicas basándote en estos datos reales.`
 
   // Crear el objeto params según el formato requerido
-  const params: any = {
+  const params: ChatParams = {
     temperature: validatedConfig.temperature,
     reasoning_effort: validatedConfig.reasoningEffort,
   }
@@ -209,11 +232,19 @@ Usa esta información para proporcionar respuestas precisas y útiles sobre las 
   }
 
   try {
+    const chatApiKey = typeof import.meta.env.VITE_CHAT_API_KEY === 'string'
+      ? import.meta.env.VITE_CHAT_API_KEY
+      : ''
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    if (chatApiKey) {
+      headers['x-api-key'] = chatApiKey
+    }
+
     const response = await fetch(validatedConfig.apiEndpoint + '/stream', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(requestBody),
     })
 
@@ -327,7 +358,7 @@ export default function ChatInterface() {
     onError: (error) => {
       const errorMessage: Message = {
         id: Date.now().toString() + '-error',
-        content: `❌ Error: ${error.message}`,
+        content: `❌ Error: ${getErrorMessage(error)}`,
         isUser: false,
         timestamp: new Date(),
       }

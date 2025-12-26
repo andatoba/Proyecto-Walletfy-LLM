@@ -98,6 +98,7 @@ npm start
 
 ### 3. Iniciar el servidor de chat (Backend)
 ```bash
+export WALLETFY_CHAT_KEY="clave-chat"
 node chat-server.mjs
 # Se ejecuta en http://localhost:4000
 ```
@@ -106,6 +107,11 @@ node chat-server.mjs
 - Navega a http://localhost:3000
 - Haz clic en el botón "Chat IA" en el header
 - ¡Comienza a hacer preguntas sobre tus finanzas!
+
+Para el frontend, define la clave (Vite):
+```bash
+export VITE_CHAT_API_KEY="clave-chat"
+```
 
 ## 💡 Ejemplos de Uso del Chat
 
